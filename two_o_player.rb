@@ -40,13 +40,14 @@ class Question
   
   attr_reader :number1, :number2
 
-  def initialize
+  def initialize(player_name)
     @number1 = rand(1..10)
     @number2 = rand(1..10)
+    @player_name = player_name
   end
 
   def question
-    puts "Player1: What does #{self.number1} plus #{self.number2} equal?"
+    puts "#{@player_name}: What does #{self.number1} plus #{self.number2} equal?"
     @player_answer = gets.chomp
   end
 
@@ -76,43 +77,45 @@ class Game
     @current_player_index = (@current_player_index + 1) % @players.length
   end
 
-  puts @player1
-
   # the game loop
   def start_the_game    
-    while current_player.current_score > 0
-      new_question = Question.new
+    while @player1.current_score != 0 && @player2.current_score != 0 
+      # create a new question
+      new_question = Question.new(current_player.name)
+      # save the player answer
       player_answer = new_question.question
+      # save the correct answer
       correct_answer = new_question.answer
       if player_answer.to_i == correct_answer.to_i
         puts "#{current_player.name}: YES! you are correct."
       else
         puts "#{current_player.name}: Seriously? No!"
+        # reduce the score when the current player gets it wrong
+        current_player.reduce_current_score
       end
+      # show the current status
+      current_status
+      # switch the player for the next turn
+      next_player
     end
-  end
-
-  # method to get the question, check the answer
-  def check_answer
-    if @player_answer == @correct_answer
-      true
-    else
-      false
-    end
+    # end of the game
+    final_status
   end
 
   # outputs current score
   def current_status
-    puts "P1: #{player1.current_score}/3 vs P2: #{player2.current_score}/3"
+    puts "P1: #{@players[0].current_score}/3 vs P2: #{@players[1].current_score}/3"
     puts "----- NEW TURN -----"
   end
 
-  # method to check if the player is dead or alive
-  def player_dead
-    if player1.current_score === 0 || player2.current_score === 0
-      true
-    else
-      false
+  # method to output the final game score
+  def final_status
+    if @player1.current_score > 0
+      puts "#{@player1.name} wins with a score of #{@player1.current_score}/3"
+      puts "----- GAME OVER -----"
+    elsif @player2.current_score > 0
+      puts "#{@player2.name} wins with a score of #{@player2.current_score}/3"
+      puts "----- GAME OVER -----"
     end
   end
 

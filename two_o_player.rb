@@ -57,7 +57,9 @@ class Question
 end
 
 class Game
-  # switch between Player1 and Player2
+
+  attr_accessor :player1
+
   def initialize
     @player1 = Player.new("Player1")
     @player2 = Player.new("Player2")
@@ -66,14 +68,29 @@ class Game
   end
  
   def current_player
-    @players[@current_player_index].name
+    @players[@current_player_index]
   end
 
+  # switches the current_player_index
   def next_player
     @current_player_index = (@current_player_index + 1) % @players.length
   end
 
-  # keep the status of the game, on or off
+  puts @player1
+
+  # the game loop
+  def start_the_game    
+    while current_player.current_score > 0
+      new_question = Question.new
+      player_answer = new_question.question
+      correct_answer = new_question.answer
+      if player_answer.to_i == correct_answer.to_i
+        puts "#{current_player.name}: YES! you are correct."
+      else
+        puts "#{current_player.name}: Seriously? No!"
+      end
+    end
+  end
 
   # method to get the question, check the answer
   def check_answer
@@ -102,4 +119,4 @@ class Game
 end
 
 newGame = Game.new
-puts newGame.current_player
+puts newGame.start_the_game
